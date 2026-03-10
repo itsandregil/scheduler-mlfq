@@ -1,11 +1,14 @@
 #include "queue/queue.h"
 #include <stdlib.h>
 
-node_t node_create(process_t *process) {
+node_t *node_create(process_t *process) {
   node_t *node = malloc(sizeof(node_t));
+  if (node == NULL) {
+    return NULL;
+  }
   node->process = process;
   node->next = NULL;
-  return *node;
+  return node;
 }
 
 void queue_init(queue_t *q) {

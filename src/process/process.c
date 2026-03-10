@@ -1,5 +1,23 @@
 #include "process/process.h"
 #include <stdio.h>
+#include <stdlib.h>
+
+process_t *process_create(int pid, int burst_time, int arrival_time) {
+  process_t *p = malloc(sizeof(process_t));
+  if (p == NULL) {
+    return NULL;
+  }
+  p->pid = pid;
+  p->burst_time = burst_time;
+  p->arrival_time = arrival_time;
+  p->waiting_time = 0;
+  p->remaining_time = burst_time;
+
+  // Use -1 because 0 means that it has already run in the CPU timeline.
+  p->start_time = -1;
+  p->finish_time = -1;
+  return p;
+}
 
 int turnaround_time(process_t *p) {
   if (p->finish_time == 0) {
@@ -10,6 +28,7 @@ int turnaround_time(process_t *p) {
 
 int response_time(process_t *p) { return p->start_time - p->arrival_time; }
 
+/* Writes the state of a process to a CSV file. */
 void process_write(FILE *f, process_t *p) {
   if (p == NULL) {
     return;

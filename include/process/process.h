@@ -9,13 +9,13 @@ typedef struct Process {
   int arrival_time;
   int start_time; // Time of first execution.
   int finish_time;
-  int waiting_time; // Total time a process waited before finishing.
+  int waiting_time; // Total time a process waited for CPU.
+  int remaining_time;
 } process_t;
 
+process_t *process_create(int pid, int burst_time, int arrival_time);
 int turnaround_time(process_t *p);
 int response_time(process_t *p);
-
-/* Writes the state of a process to a CSV file. */
 void process_write(FILE *f, process_t *p);
 
 #endif
