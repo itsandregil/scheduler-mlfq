@@ -41,3 +41,16 @@ node_t *dequeue(queue_t *q) {
   node->next = NULL;
   return node;
 }
+
+void queue_display(queue_t *q) {
+  if (q == NULL || q->head == NULL) {
+    printf("Queue is empty\n");
+    return;
+  }
+  node_t *current = q->head;
+  while (current != NULL) {
+    printf("[PID=%d] -> ", current->process->pid);
+    current = current->next;
+  }
+  printf("NULL\n");
+}
