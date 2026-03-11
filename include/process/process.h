@@ -13,7 +13,7 @@ typedef struct Process {
   int remaining_time;
 } process_t;
 
-process_t *process_create(int pid, int burst_time, int arrival_time);
+process_t process_create(int pid, int burst_time, int arrival_time);
 int turnaround_time(process_t *p);
 int response_time(process_t *p);
 void process_write(FILE *f, process_t *p);
