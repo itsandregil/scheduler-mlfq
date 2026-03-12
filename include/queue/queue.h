@@ -13,12 +13,18 @@ typedef struct Node {
 typedef struct Queue {
     node_t *head;
     node_t *tail;
+    int time_quantum;
 } queue_t;
 
 node_t *node_create(process_t *process);
-void queue_init(queue_t *q);
+void node_destroy(node_t *node);
+
 void enqueue(queue_t *q, node_t *node);
 node_t *dequeue(queue_t *q);
+int queue_is_empty(queue_t *q);
+int all_queues_empty(queue_t *queues, int num_queues);
+
+void queue_init(queue_t *q, int time_quantum);
 void queue_display(queue_t *q);
 
 #endif
