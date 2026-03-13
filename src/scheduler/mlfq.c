@@ -71,6 +71,7 @@ void mlfq_schedule(int num_queues, int boost_time, process_t processes[],
     sleep(1);
   }
   printf("Total CPU time taken: %dms\n", current_time);
+  write_output("output.csv", processes, num_processes);
 }
 
 int runtime(process_t *process, int time_quantum) {
