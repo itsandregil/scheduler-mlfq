@@ -23,6 +23,8 @@ int turnaround_time(process_t *p) {
 
 int response_time(process_t *p) { return p->start_time - p->arrival_time; }
 
+int waiting_time(process_t *p) { return turnaround_time(p) - p->burst_time; }
+
 /* Writes the state of a process to a CSV file. */
 void process_write(FILE *f, process_t *p) {
   if (p == NULL) {
@@ -30,7 +32,7 @@ void process_write(FILE *f, process_t *p) {
   }
   fprintf(f, "%d, %d, %d, %d, %d, %d, %d, %d\n", p->pid, p->arrival_time,
           p->burst_time, p->start_time, p->finish_time, turnaround_time(p),
-          response_time(p), p->waiting_time);
+          response_time(p), waiting_time(p));
 }
 
 void process_sort(process_t processes[], int num_processes) {

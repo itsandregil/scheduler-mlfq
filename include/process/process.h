@@ -18,6 +18,7 @@ void process_write(FILE *f, process_t *p);
 
 int turnaround_time(process_t *p);
 int response_time(process_t *p);
+int waiting_time(process_t *p);
 
 void process_sort(process_t processes[], int num_processes);
 
