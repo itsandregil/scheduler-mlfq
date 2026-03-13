@@ -14,8 +14,11 @@ typedef struct Process {
 } process_t;
 
 process_t process_create(int pid, int burst_time, int arrival_time);
+void process_write(FILE *f, process_t *p);
+
 int turnaround_time(process_t *p);
 int response_time(process_t *p);
-void process_write(FILE *f, process_t *p);
+
+void process_sort(process_t processes[], int num_processes);
 
 #endif

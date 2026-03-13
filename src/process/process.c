@@ -32,3 +32,15 @@ void process_write(FILE *f, process_t *p) {
           p->burst_time, p->start_time, p->finish_time, turnaround_time(p),
           response_time(p), p->waiting_time);
 }
+
+void process_sort(process_t processes[], int num_processes) {
+  for (int i = 0; i < num_processes; i++) {
+    for (int j = i + 1; j < num_processes; j++) {
+      if (processes[i].arrival_time > processes[j].arrival_time) {
+        process_t temp = processes[i];
+        processes[i] = processes[j];
+        processes[j] = temp;
+      }
+    }
+  }
+}
