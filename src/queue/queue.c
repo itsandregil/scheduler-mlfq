@@ -18,7 +18,7 @@ void node_destroy(node_t *node) {
   free(node);
 }
 
-void queue_init(queue_t *q, int time_quantum) {
+void queue_init_helper(queue_t *q, int time_quantum) {
   q->head = NULL;
   q->tail = NULL;
   q->time_quantum = time_quantum;
@@ -52,7 +52,7 @@ node_t *dequeue(queue_t *q) {
 
 void queue_display(queue_t *q) {
   if (q == NULL || q->head == NULL) {
-    printf("Queue is empty\n");
+    printf("-\n");
     return;
   }
   node_t *current = q->head;
@@ -80,4 +80,10 @@ int all_queues_empty(queue_t queues[], int num_queues) {
     }
   }
   return 1;
+}
+
+void queues_init(queue_t queues[], int num_queues) {
+  for (int i = 0; i < num_queues; i++) {
+    queue_init_helper(&queues[i], 1 << (i + 1));
+  }
 }

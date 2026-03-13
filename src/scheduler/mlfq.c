@@ -1,31 +1,48 @@
 #include "scheduler/mlfq.h"
+#include "process/process.h"
 #include "queue/queue.h"
 #include "utils/utils.h"
 #include <stdlib.h>
+#include <unistd.h>
 
-// TODO: Implement boosting after a given time.
 void mlfq_schedule(int num_queues, int boost_time, process_t processes[],
                    int num_processes) {
   queue_t queues[num_queues];
-
-  // Initialize all queues.
-  for (int i = 0; i < num_queues; i++) {
-    queue_init(&queues[i], 1 << (i + 1));
-  }
-
-  // TODO: Move this inside the loop. Processes arrive at different times and
-  // should be push to the top queue when they have arrive and not before.
-  for (int i = 0; i < num_processes; i++) {
-    node_t *node = node_create(&processes[i]);
-    enqueue(&queues[0], node);
-  }
+  queues_init(queues, num_queues);
+  process_sort(processes, num_processes);
 
   int current_time = 0;
-  while (!all_queues_empty(queues, num_queues)) {
-    for (int i = 0; i < num_queues; i++) {
-      printf("=========Current Time: (%dms) =========\n", current_time);
-      display_queues_state(queues, num_queues);
+  int next_pid = 0;
+  int next_boost_time = boost_time;
 
+  while (!all_queues_empty(queues, num_queues) || next_pid < num_processes) {
+
+    while (next_pid < num_processes &&
+           processes[next_pid].arrival_time <= current_time) {
+      node_t *node = node_create(&processes[next_pid]);
+      enqueue(&queues[0], node);
+      next_pid++;
+    }
+
+    if (all_queues_empty(queues, num_queues) && next_pid < num_processes) {
+      current_time = processes[next_pid].arrival_time;
+      continue;
+    }
+
+    if (current_time >= next_boost_time) {
+      for (int i = 1; i < num_queues; i++) {
+        while (!queue_is_empty(&queues[i])) {
+          node_t *node = dequeue(&queues[i]);
+          enqueue(&queues[0], node);
+        }
+      }
+      next_boost_time += boost_time;
+    }
+
+    printf("=========Current Time: (%dms) =========\n", current_time);
+    display_queues_state(queues, num_queues);
+
+    for (int i = 0; i < num_queues; i++) {
       if (queue_is_empty(&queues[i])) {
         continue;
       }
@@ -34,21 +51,39 @@ void mlfq_schedule(int num_queues, int boost_time, process_t processes[],
       node_t *node = dequeue(&queues[i]);
       process_t *process = node->process;
 
-      if (process->arrival_time > current_time) {
-        enqueue(&queues[i], node);
-        continue;
+      if (process->start_time == -1) {
+        process->start_time = current_time;
       }
 
-      process->start_time = current_time;
-      process->remaining_time -= quantum;
-      current_time += quantum;
+      int t = runtime(process, quantum);
+      process->remaining_time -= t;
+      current_time += t;
 
-      if (process->remaining_time > 0 && i < num_queues - 1) {
-        enqueue(&queues[i + 1], node);
+      if (process->remaining_time > 0) {
+        demote(node, i, queues, num_queues);
       } else {
         process->finish_time = current_time;
         node_destroy(node);
       }
+
+      break;
     }
+    sleep(1);
+  }
+  printf("Total CPU time taken: %dms\n", current_time);
+}
+
+int runtime(process_t *process, int time_quantum) {
+  if (process->remaining_time <= time_quantum) {
+    return process->remaining_time;
+  }
+  return time_quantum;
+}
+
+void demote(node_t *node, int current_queue, queue_t queues[], int num_queues) {
+  if (current_queue < num_queues - 1) {
+    enqueue(&queues[current_queue + 1], node);
+  } else {
+    enqueue(&queues[current_queue], node);
   }
 }

@@ -24,7 +24,8 @@ node_t *dequeue(queue_t *q);
 int queue_is_empty(queue_t *q);
 int all_queues_empty(queue_t *queues, int num_queues);
 
-void queue_init(queue_t *q, int time_quantum);
+void queue_init_helper(queue_t *q, int time_quantum);
+void queues_init(queue_t queues[], int num_queues);
 void queue_display(queue_t *q);
 
 #endif
